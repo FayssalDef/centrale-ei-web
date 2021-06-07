@@ -66,12 +66,54 @@
         >
       </li>
     </ul>
+    <input v-model="movieName" placeholder="votre film" />
+    <p>Le message est : {{ movieName }}</p>
+    <ul id="array-rendering">
+      <li v-for="movie in movies" :key="movie.id">
+        <Movie :movie="movie" />
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+import Movie from "@/components/Movie.vue";
+import axios from "axios";
 export default {
   name: "Home",
+  components: {
+    Movie,
+  },
+  data: function () {
+    return {
+      movieName: "",
+    };
+  },
+
+  data: function () {
+    return {
+      movies: [],
+    };
+  },
+  methods: {
+    fetchMovies: function () {
+      axios
+        .get(
+          `https://api.themoviedb.org/3/movie/popular?api_key=a0a7e40dc8162ed7e37aa2fc97db5654&language=en-US&page=1`
+        )
+        .then((response) => {
+          for (const d in response.data.results)
+            this.movies.push(response.data.results[d]);
+        })
+        .catch((error) => {
+          this.usersLoadingError = "An error occured while fetching users.";
+          console.error(error);
+        });
+    },
+  },
+  created() {
+    this.fetchMovies();
+  },
 };
 </script>
 
